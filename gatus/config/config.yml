@@ -1,0 +1,53 @@
+metrics: true
+storage:
+  type: sqlite
+  path: /config/gatus.db
+endpoints:
+  - name: Victoriametrics Docs
+    url: https://docs.victoriametrics.com
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CERTIFICATE_EXPIRATION] > 14d"
+  - name: Victoriametrics
+    url: https://victoriametrics.com
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CERTIFICATE_EXPIRATION] > 14d"
+  - name: Victoriametrics DNS Cloudflare
+    url: "1.1.1.1"
+    dns:
+      query-name: "victoriametrics.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+  - name: Victoriametrics DNS Quad9
+    url: "9.9.9.9"
+    dns:
+      query-name: "victoriametrics.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+  - name: Victoriametrics Docs DNS Cloudflare
+    url: "1.1.1.1"
+    dns:
+      query-name: "docs.victoriametrics.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+  - name: Victoriametrics Docs DNS Quad9
+    url: "9.9.9.9"
+    dns:
+      query-name: "docs.victoriametrics.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+  - name: Victoriametrics Ping
+    url: "icmp://victoriametrics.com"
+    conditions:
+      - "[CONNECTED] == true"
+  - name: Victoriametrics Docs Ping
+    url: "icmp://docs.victoriametrics.com"
+    conditions:
+      - "[CONNECTED] == true"

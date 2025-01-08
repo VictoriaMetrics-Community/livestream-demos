@@ -1,0 +1,9 @@
+**/*.env
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*acme.json
+**/victoriametrics-storage
+**/remotewrite-data
+**/.cache/**
+**/traefik/**

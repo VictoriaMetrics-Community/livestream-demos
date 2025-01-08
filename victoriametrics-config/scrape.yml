@@ -4,7 +4,7 @@ scrape_configs:
   scrape_timeout: 20s
   static_configs:
     - targets:
-      - 'http://127.0.0.1:8429'
+      - 'http://127.0.0.1:8428'
       - 'http://gatus:8080'
       - 'http://blackbox-exporter:9115'
       - 'http://telegraf:9273'

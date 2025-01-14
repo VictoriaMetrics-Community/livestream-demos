@@ -47,6 +47,10 @@ endpoints:
     url: "icmp://victoriametrics.com"
     conditions:
       - "[CONNECTED] == true"
+  - name: Cloudflare Ping
+    url: "icmp://1.1.1.1"
+    conditions:
+      - "[CONNECTED] == true"
   - name: Victoriametrics Docs Ping
     url: "icmp://docs.victoriametrics.com"
     conditions:

@@ -14,7 +14,7 @@ scrape_configs:
   scrape_timeout: 20s
   basic_auth:
     username: ' '
-    password: 'SUPER_SECRET_PASSWORD'
+    password: 'uk1_6kJAQFXLKF60joWBF_03_J28qH0i519ayHBw8PbU'
   static_configs:
     - targets:
       - 'http://uptime-kuma:3001'

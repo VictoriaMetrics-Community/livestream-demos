@@ -54,5 +54,31 @@ services:
       - "-promscrape.config=/config/scrape.yml"
       - "-storageDataPath=/storage"
       - "-retentionPeriod=90d"
+      - "-vmalert.proxyURL=http://vmalert:9093"
     ports:
       - 8428:8428
+  vmalert:
+    container_name: vmalert
+    image: docker.io/victoriametrics/vmalert:latest
+    restart: unless-stopped
+    volumes:
+      - ./vmalert:/rules
+    command:
+      - "-notifier.blackhole"
+      - "-datasource.url=http://victoriametrics:8428"
+      - "-remoteWrite.url=http://victoriametrics:8428"
+      - "-remoteRead.url=http://victoriametrics:8428"
+      - "-rule=/rules/*.yaml"
+      - "-rule=rules/*.yml"
+  grafana:
+    container_name: grafana
+    image: docker.io/grafana/grafana-oss:latest
+    user: root
+    restart: unless-stopped
+    volumes:
+      - ./grafana/config:/etc/grafana
+      - ./grafana/data:/var/lib/grafana
+    environment:
+      GF_INSTALL_PLUGINS: https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource
+    ports:
+      - 3000:3000

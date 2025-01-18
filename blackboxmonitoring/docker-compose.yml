@@ -42,7 +42,7 @@ services:
       - "-promscrape.config=/config/scrape.yml"
       - "-storageDataPath=/storage"
       - "-retentionPeriod=90d"
-      - "-vmalert.proxyURL=http://vmalert:9093"
+      - "-vmalert.proxyURL=http://vmalert:8880"
     ports:
       - 8428:8428
   vmalert:
@@ -58,6 +58,8 @@ services:
       - "-remoteRead.url=http://victoriametrics:8428"
       - "-rule=/rules/*.yaml"
       - "-rule=rules/*.yml"
+    ports:
+      - 8880:8880
   grafana:
     container_name: grafana
     image: docker.io/grafana/grafana-oss:latest

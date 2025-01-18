@@ -1,5 +1,5 @@
 groups:
-  - name: blackbox_latency_1h
+  - name: uptimekuma_latency_1h
     limit: 0
     interval: 5m
     rules:
@@ -27,7 +27,7 @@ groups:
         expr: 'quantile_over_time(.99,http_response_response_time{}[1h])'
         labels:
           quantile: "p99"
-  - name: blackbox_latency_1d
+  - name: uptimekuma_latency_1d
     limit: 0
     interval: 10m
     rules:
@@ -55,7 +55,7 @@ groups:
         expr: 'quantile_over_time(.99,dns_query_query_time_ms{}[1d])'
         labels:
           quantile: "p99"
-  - name: blackbox_uptime_1d
+  - name: uptimekuma_uptime_1d
     limit: 0
     interval: 10m
     rules:
@@ -71,3 +71,37 @@ groups:
         expr: 'sum by (server,host) (clamp(http_response_result_code,0,1))'
       - record: "dns:uptime:7d"
         expr: '1 - ((sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code,0,1))[1d])) / (sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code,1,1))[7d])))'
+  - name: Telegraf Blackbox Alerts
+    interval: 1m
+    type: prometheus
+    rules:
+      - alert: HTTP Blackbox Failing
+        expr: 'http_response_result_code{check_type="normal"} > 0'
+        for: 10m
+        annotations:
+          summary: '{{ $labels.server }} is not healthy'
+          description: '{{ $labels.server }} is not responding properly from {{ $labels.host }}'
+      - alert: DNS Blackbox Failing
+        expr: 'dns_query_result_code{check_type="normal"} > 0'
+        for: 5m
+        annotations:
+          summary: 'DNS lookups are not working on {{ $labels.server }}'
+          description: 'Users can  not lookup {{ $labels.domain }} on {{ $labels.server }} with record {{ $labels.record_type }}'
+      - alert: Net Response Blackbox Failing
+        expr: 'net_response_result_code{check_type="normal"} > 0'
+        for: 5m
+        annotations:
+          summary: '{{ $labels.server }} is not healthy'
+          description: '{{ $labels.server }} is not reachable from {{ $labels.host }}'
+      - alert: ping Blackbox Failing
+        expr: 'ping_result_code{check_type="normal"} > 0'
+        for: 5m
+        annotations:
+          summary: 'ping is not working on working on {{ $labels.url }}'
+          description: 'ping is not working on {{ $labels.url }} from {{ $labels.host }}'
+      - alert: TLS certificate expiring
+        expr: '((x509_cert_enddate{} - time()) / 86400) < 14'
+        for: 10m
+        annotations:
+          summary: '{{ $labels.common_name }} will expire soon please renew'
+          description: '{{ $labels.common_name }} will expire in {{ $value }} seconds according to {{ $labels.host }}'

@@ -8,7 +8,6 @@ scrape_configs:
       - 'http://gatus:8080'
       - 'http://blackbox-exporter:9115'
       - 'http://telegraf:9273'
-      - 'http://traefik:8082'
 - job_name: uptime_kuma
   scrape_interval: 30s
   scrape_timeout: 20s

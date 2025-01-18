@@ -1,16 +1,4 @@
 services:
-  traefik:
-    restart: unless-stopped
-    image: docker.io/traefik:latest
-    container_name: traefik
-    env_file:
-      - traefik.env
-    volumes:
-      - ./traefik:/etc/traefik
-    ports:
-     - "80:80"
-     - "443:443"
-     - "127.0.0.1:8082:8082"
   uptime-kuma:
     container_name: uptime-kuma
     image: docker.io/louislam/uptime-kuma:1

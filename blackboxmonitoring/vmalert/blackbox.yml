@@ -1,0 +1,73 @@
+groups:
+  - name: blackbox_latency_1h
+    limit: 0
+    interval: 5m
+    rules:
+      - record: "dns:response:time:1h"
+        expr: 'quantile_over_time(.5,dns_query_query_time_ms{}[1h])'
+        labels:
+          quantile: "p50"
+      - record: "dns:response:time:1h"
+        expr: 'quantile_over_time(.9,dns_query_query_time_ms{}[1h])'
+        labels:
+          quantile: "p90"
+      - record: "dns:response:time:1h"
+        expr: 'quantile_over_time(.99,dns_query_query_time_ms{}[1h])'
+        labels:
+          quantile: "p99"
+      - record: "http:response:time:1h"
+        expr: 'quantile_over_time(.5,http_response_response_time{}[1h])'
+        labels:
+          quantile: "p50"
+      - record: "http:response:time:1h"
+        expr: 'quantile_over_time(.9,http_response_response_time{}[1h])'
+        labels:
+          quantile: "p90"
+      - record: "http:response:time:1h"
+        expr: 'quantile_over_time(.99,http_response_response_time{}[1h])'
+        labels:
+          quantile: "p99"
+  - name: blackbox_latency_1d
+    limit: 0
+    interval: 10m
+    rules:
+      - record: "http:response:time:1d"
+        expr: 'quantile_over_time(.5,http_response_response_time{}[1d])'
+        labels:
+          quantile: "p50"
+      - record: "http:response:time:1d"
+        expr: 'quantile_over_time(.9,http_response_response_time{}[1d])'
+        labels:
+          quantile: "p90"
+      - record: "http:response:time:1d"
+        expr: 'quantile_over_time(.99,http_response_response_time{}[1d])'
+        labels:
+          quantile: "p99"
+      - record: "dns:response:time:1d"
+        expr: 'quantile_over_time(.5,dns_query_query_time_ms{}[1d])'
+        labels:
+          quantile: "p50"
+      - record: "dns:response:time:1d"
+        expr: 'quantile_over_time(.9,dns_query_query_time_ms{}[1d])'
+        labels:
+          quantile: "p90"
+      - record: "dns:response:time:1d"
+        expr: 'quantile_over_time(.99,dns_query_query_time_ms{}[1d])'
+        labels:
+          quantile: "p99"
+  - name: blackbox_uptime_1d
+    limit: 0
+    interval: 10m
+    rules:
+      - record: "http:uptime:1d"
+        expr: 'sum by (server,host) (clamp(http_response_result_code,0,1))'
+      - record: "dns:uptime:1d"
+        expr: '1 - ((sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code{check_type="normal"},0,1))[1d])) / (sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code{check_type="normal"},1,1))[7d])))'
+  - name: blackbox_uptime_7d
+    limit: 0
+    interval: 10m
+    rules:
+      - record: "http:uptime:7d"
+        expr: 'sum by (server,host) (clamp(http_response_result_code,0,1))'
+      - record: "dns:uptime:7d"
+        expr: '1 - ((sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code,0,1))[1d])) / (sum_over_time(sum by (server,record_type,domain,host) (clamp(dns_query_result_code,1,1))[7d])))'

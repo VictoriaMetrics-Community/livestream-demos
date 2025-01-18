@@ -1,0 +1,84 @@
+services:
+  traefik:
+    restart: unless-stopped
+    image: docker.io/traefik:latest
+    container_name: traefik
+    env_file:
+      - traefik.env
+    volumes:
+      - ./traefik:/etc/traefik
+    ports:
+     - "80:80"
+     - "443:443"
+     - "127.0.0.1:8082:8082"
+  uptime-kuma:
+    container_name: uptime-kuma
+    image: docker.io/louislam/uptime-kuma:1
+    restart: unless-stopped
+    volumes:
+      - ./uptime-kuma:/app/data
+    ports:
+      - 3001:3001
+  gatus:
+    image: twinproduction/gatus:latest
+    container_name: gatus
+    volumes:
+      - ./gatus/config:/config
+    ports:
+      - 8080:8080
+  blackbox-exporter:
+    container_name: blackbox_exporter
+    restart: unless-stopped
+    image: quay.io/prometheus/blackbox-exporter:latest
+    volumes:
+      - ./blackbox-exporter/config:/config
+    command:
+      - '--config.file=/config/blackbox.yml'
+    ports:
+      - 9115:9115
+  telegraf:
+    container_name: telegraf
+    image: docker.io/telegraf:latest
+    volumes:
+      - ./telegraf:/etc/telegraf
+    ports:
+      - 9273:9273
+  victoriametrics:
+    container_name: victoriametrics
+    image: docker.io/victoriametrics/victoria-metrics:latest
+    restart: unless-stopped
+    volumes:
+      - ./victoriametrics-config:/config
+      - ./victoriametrics-storage:/storage
+    command:
+      - "-promscrape.config=/config/scrape.yml"
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=90d"
+      - "-vmalert.proxyURL=http://vmalert:9093"
+    ports:
+      - 8428:8428
+  vmalert:
+    container_name: vmalert
+    image: docker.io/victoriametrics/vmalert:latest
+    restart: unless-stopped
+    volumes:
+      - ./vmalert:/rules
+    command:
+      - "-notifier.blackhole"
+      - "-datasource.url=http://victoriametrics:8428"
+      - "-remoteWrite.url=http://victoriametrics:8428"
+      - "-remoteRead.url=http://victoriametrics:8428"
+      - "-rule=/rules/*.yaml"
+      - "-rule=rules/*.yml"
+  grafana:
+    container_name: grafana
+    image: docker.io/grafana/grafana-oss:latest
+    user: root
+    restart: unless-stopped
+    volumes:
+      - ./grafana/config:/etc/grafana
+      - ./grafana/data:/var/lib/grafana
+    environment:
+      GF_INSTALL_PLUGINS: https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource
+    ports:
+      - 3000:3000

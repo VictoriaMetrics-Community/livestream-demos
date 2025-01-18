@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: blackbox monitoring
+    folder: blackboxmonitoring
+    type: file
+    options:
+      path: /var/lib/grafana/blackbox-dashboards

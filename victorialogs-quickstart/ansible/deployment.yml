@@ -1,0 +1,7 @@
+- hosts: all
+  become: true
+  roles:
+    - victoriametrics.cluster.vmsingle
+    - victoriametrics.cluster.vlsingle
+    - victoriametrics.cluster.vmalert
+    - victoriametrics.cluster.vmauth

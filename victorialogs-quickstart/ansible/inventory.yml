@@ -2,10 +2,15 @@ all:
   hosts:
     localhost:
   vars:
-    victorialogs_version: v1.11.0
-    vic_vm_alert_version: v1.111.0
-    victoriametrics_version: v1.111.0
-    vmauth_version: v1.111.0
+    victorialogs_version: v1.14.0
+    vic_vm_alert_version: v1.112.0
+    victoriametrics_version: v1.112.0
+    vmauth_version: v1.112.0
     victoriametrics_service_envflag_enabled: true
     victoriametrics_service_envflag_data:
       - 'vmalert.proxyURL=http://127.0.0.1:9431'
+    victorialogs_service_args:
+      storageDataPath: "{{ victorialogs_data_dir }}"
+      retentionPeriod: "60d"
+      syslog.listenAddr.tcp: '0.0.0.0:5140'
+      syslog.listenAddr.udp: '0.0.0.0:5140'

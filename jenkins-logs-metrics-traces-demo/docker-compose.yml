@@ -1,0 +1,64 @@
+services:
+  jenkins-demo:
+    image: jenkins/jenkins:lts
+    container_name: jenkins-demo
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    restart: unless-stopped
+  otel-collector:
+    hostname: otel_collector
+    image: otel/opentelemetry-collector-contrib:0.135.0
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+      - "127.0.0.1:55679:55679"
+      - "127.0.0.1:1234:1234"
+  victoriatraces:
+    # todo: use official image when it is released
+    image: 'docker.io/victoriametrics/victoria-traces:v0.3.0'
+    #ports:
+    #  - "10428:10428"
+    command:
+      - "--storageDataPath=/vtraces"
+      - "--retentionPeriod=1d"
+    volumes:
+      - vtdata:/vtraces
+  victorialogs:
+    image: victoriametrics/victoria-logs:latest
+    ports:
+      - "9428:9428"
+    volumes:
+      - victorialogs-data:/victoria-logs-data
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    ports:
+      - "8428:8428"
+    volumes:
+      - victoriametrics-data:/victoria-metrics-data
+
+
+  grafana:
+    image: grafana/grafana:main
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      GF_INSTALL_PLUGINS: victoriametrics-metrics-datasource,victoriametrics-logs-datasource
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./dashboard-default.yaml:/etc/grafana/provisioning/dashboards/dashboard-default.yaml
+      - ./dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+
+volumes:
+  jenkins_home:
+  vtdata:
+  grafana-storage:
+  victorialogs-data:
+  victoriametrics-data:

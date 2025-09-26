@@ -1,0 +1,37 @@
+apiVersion: 1
+datasources:
+  - name: test-metrics
+    type: prometheus
+    url: 'http://victoriametrics:8428'
+    jsonData:
+      httpmethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.53.0
+      disableRecordingRules: false
+      timeInterval: 15s
+
+  - name: test-logs
+    type: victoriametrics-logs-datasource
+    url: http://victorialogs:9428
+    access: proxy
+
+  - name: test-traces
+    type: jaeger
+    uid: EbPG8fYoz
+    url: http://victoriatraces:10428/select/jaeger
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: 'test-logs'
+        filterByTraceID: false
+        filterBySpanID: false
+        customQuery: true
+        query: 'trace_id:="${__span.traceId}"'
+      tracesToMetrics:
+        datasourceUid: 'test-metrics'
+        tags: [{ key: 'service.instance.id'}]
+        queries:
+          - name: 'Memory Usage'
+            query: 'sum(jvm.memory.used{$__tags}) / sum(jvm.memory.limit{$__tags})'
+          - name: 'CPU Usage'
+            query: 'jvm.system.cpu.utilization{$__tags} * 100'

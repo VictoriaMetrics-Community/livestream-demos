@@ -16,13 +16,13 @@ Restart docker `sudo systemctl restart docker`
 
 ## Setup
 ```bash
-docker compose up -d
+sudo docker compose up -d
 ```
 
 ## Logging into Jenkins
 Use the password from in the next step for the admin wizard setup
 ```bash
-cat /var/lib/docker/volumes/jenkins_jenkins_home/_data/secrets/initialAdminPassword
+sudo cat /var/lib/docker/volumes/jenkins-logs-metrics-traces-demo_jenkins_home/_data/secrets/initialAdminPassword
 ```
 1. Goto the login screen for jenkins. substitute `your_ip` with your machines IP address. `http://your_ip:8080`
 2. `Install suggested plugins`.
@@ -39,11 +39,14 @@ Scroll to the bottom and check the `Restart Jenkins box`
 2. Scroll down to `OTLP Endpoint` `http://otel_collector:4317`
 
 3. Click on `Add Visualisation Observability Backend` Select `Custom Observability Backend` we will do this twice will the following values.
+  
+  NOTE: Substitute `your_ip` with your IP address/domain name.
+  
   Name: `View Traces`
-  Trace visualization URL template: `http://35.239.115.183:3000/explore?schemaVersion=1&panes=%7B%22u0h%22:%7B%22datasource%22:%22deyz29j2g3qbkb%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22deyz29j2g3qbkb%22%7D,%22queryType%22:%22search%22,%22service%22:%22jenkins%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1`
+  `Trace visualization URL template`: `http://your_ip:3000/explore?schemaVersion=1&panes=%7B%22u0h%22:%7B%22datasource%22:%22deyz29j2g3qbkb%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22deyz29j2g3qbkb%22%7D,%22queryType%22:%22search%22,%22service%22:%22jenkins%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1`
   
   Name: `View Dashboard`
-  Trace visualization URL template: `http://35.239.115.183:3000/d/adzf6pd/test`
+  `Trace visualization URL template`: `http://your_ip:3000/d/adzf6pd/test`
 
 4. Click on `Apply` than `Save`
 

@@ -1,0 +1,63 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+    # We are using the token directly, but a filename may also be provided
+    # This is used to authenticate with VictoriaMetrics Cloud, and
+    # needs to be included in the otlp exporter (see below).
+  bearertokenauth:
+    scheme: "Bearer"
+    token: "test"
+processors:
+  batch:
+receivers:
+  # Collect own metrics
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  syslog:
+    udp:
+      listen_address: "0.0.0.0:1234"
+    protocol: rfc5424
+exporters:
+  otlphttp/metrics:
+    endpoint: 'http://victoriametrics:8428/opentelemetry'
+  otlphttp/traces:
+    endpoint: 'http://victoriatraces:10428/insert/opentelemetry'
+  otlphttp/logs:
+    endpoint: 'http://victorialogs:9428/insert/opentelemetry'
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlphttp/metrics
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlphttp/traces
+    logs:
+      receivers:
+        - otlp
+        - syslog
+      processors:
+        - batch
+      exporters:
+        - otlphttp/logs
+  extensions:
+    - health_check
+    - pprof
+    - bearertokenauth
